@@ -1,1 +1,91 @@
+####################
+###Tree Algorithm###
+####################
+#http://blog.csdn.net/lsldd/article/details/41223147   
+
+# -*- coding: utf-8 -*-  
+import numpy as np
+import scipy as sp
+from sklearn import tree
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import classification_report
+from sklearn.cross_validation import train_test_split
+
+# input data
+data=[]
+labels=[]
+with open('tree.txt') as ifile:
+    for line in ifile:
+        tokens = line.strip().split(' ') # 先删除每行的空格，再以.分隔
+        data.append([float(tk) for tk in tokens[:-1]])
+        labels.append(tokens[-1])
+
+x=np.array(data)
+labels=np.array(labels)
+y=np.zeros(labels.shape)
+
+#标签转换为0/1
+y[labels=='fat']=1
+
+# 拆分训练数据与测试数据
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2) # 20%的数据进行测试
+
+# 使用信息熵作为划分标准，对决策树进行训练
+clf = tree.DecisionTreeClassifier(criterion='entropy')
+print(clf)
+clf.fit(x_train, y_train)
+
+#把决策树结构写入文件
+with open("tree1.dot", 'w') as f:
+    f = tree.export_graphviz(clf, out_file=f)
+    
+# 系数反映每个特征的影响力，越大表示该特征在分类中起到的作用越大
+print(clf.feature_importances_) 
+
+# 测试结果的打印
+answer = clf.predict(x_train)
+print(x_train)
+print(answer)
+print(y_train)
+print(np.mean(answer==y_train))
+
+# 准确率与召回率
+precision, recall, thresholds = precision_recall_curve(y_train, clf.predict(x_train))
+answer = clf.predict_proba(x)[:, 1]
+print(classification_report(y, answer, target_names = ['thin', 'fat']))
+
+# output
+DecisionTreeClassifier(class_weight=None, criterion='entropy', max_depth=None,
+            max_features=None, max_leaf_nodes=None,
+            min_impurity_split=1e-07, min_samples_leaf=1,
+            min_samples_split=2, min_weight_fraction_leaf=0.0,
+            presort=False, random_state=None, splitter='best')
+[ 0.27501449  0.72498551]
+[[  1.5  60. ]
+ [  1.6  40. ]
+ [  1.7  60. ]
+ [  1.9  80. ]
+ [  1.8  90. ]
+ [  1.7  80. ]
+ [  1.6  60. ]
+ [  1.8  60. ]]
+[ 1.  0.  0.  1.  1.  1.  1.  0.]
+[ 1.  0.  0.  1.  1.  1.  1.  0.]
+1.0
+             precision    recall  f1-score   support
+
+       thin       1.00      1.00      1.00         5
+        fat       1.00      1.00      1.00         5
+
+avg / total       1.00      1.00      1.00        10
+
+# input my height and weight
+answer = clf.predict([1.8, 92])
+#print(x_train)
+print(answer)
+
+[ 1.]
+
+
+
 
