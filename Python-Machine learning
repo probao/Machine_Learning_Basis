@@ -1,0 +1,153 @@
+###############
+####线性模型####
+###############
+
+
+
+# coding: utf-8
+
+# In[1]:
+
+#######################
+######线性回归#########
+#######################
+
+
+# In[2]:
+
+#线性回归模型
+# 对于这个例子的解释http://blog.csdn.net/zhangyingchengqi/article/details/54809401
+# diabetes 是一个关于糖尿病的数据集， 该数据集包括442个病人的生理数据及一年以后的病情发展情况。   
+# 数据集中的特征值总共10项, 如下:  
+    # 年龄  
+    # 性别  
+    #体质指数  
+    #血压  
+    #s1,s2,s3,s4,s4,s6  (六种血清的化验数据)  
+    #但请注意，以上的数据是经过特殊处理， 10个数据中的每个都做了均值中心化处理，然后又用标准差乘以个体数量调整了数值范围。验证就会发现任何一列的所有数值平方和为1.   
+      
+#关于数据集更多的信息: http://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html  
+   # http://scikit-learn.org/stable/datasets/index.html#datasets
+
+
+# In[3]:
+
+from sklearn import datasets
+diabetes = datasets.load_diabetes()
+
+
+# In[10]:
+
+diabetes.data[0]
+
+array([ 0.03807591,  0.05068012,  0.06169621,  0.02187235, -0.0442235 ,
+       -0.03482076, -0.04340085, -0.00259226,  0.01990842, -0.01764613])
+
+# In[12]:
+
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn import datasets, linear_model, discriminant_analysis, cross_validation
+
+
+# In[16]:
+
+# 这里给出加载数据集的函数
+def load_data():
+    diabetes =datasets.load_diabetes()
+    return cross_validation.train_test_split(diabetes.data, diabetes.target, test_size=0.25, random_state=0)
+#返回值：一个元组，元组依次是：训练样本集、测试样本集、训练样本集对应的标签值、测试样本集对应的标签值
+
+
+# In[17]:
+
+# 使用LinearRegression的函数如下：
+def test_LinearRegression(*data):
+    X_train,X_test,y_train,y_test=data
+    regr = linear_model.LinearRegression()
+    regr.fit(X_train, y_train)
+    print('Coefficients:%s, intercept %.2f'%(regr.coef_, regr.intercept_))
+    print("Residual sum of squares: %.2f" % np.mean((regr.predict(X_test)-y_test)**2))
+    print('Score: %.2f'% regr.score(X_test, y_test))
+
+
+# In[18]:
+
+X_train, X_test, y_train, y_test=load_data()
+test_LinearRegression(X_train, X_test, y_train, y_test)
+
+Coefficients:[ -43.26774487 -208.67053951  593.39797213  302.89814903 -560.27689824
+  261.47657106   -8.83343952  135.93715156  703.22658427   28.34844354], intercept 153.07
+Residual sum of squares: 3180.20
+Score: 0.36
+
+
+# In[19]:
+
+##########################
+###线性回归模型的正则化###
+##########################
+
+
+# In[20]:
+
+#岭回归
+def test_Ridge(*data):  # *表示输入参数表示为元组
+    X_train, X_test, y_train, y_test = data
+    regr = linear_model.Ridge()
+    regr.fit(X_train, y_train)
+    print('Coefficients: %s, intercept %.2f' % (regr.coef_, regr.intercept_))
+    print('Residual sum of squares: %.2f' % np.mean((regr.predict(X_test)-y_test)**2))
+    print('Score: %.2f' % regr.score(X_test, y_test))
+
+
+# In[21]:
+
+X_train, X_test, y_train, y_test = load_data()
+test_Ridge(X_train, X_test, y_train, y_test)
+
+
+Coefficients: [  21.19927911  -60.47711393  302.87575204  179.41206395    8.90911449
+  -28.8080548  -149.30722541  112.67185758  250.53760873   99.57749017], intercept 152.45
+Residual sum of squares: 3192.33
+Score: 0.36
+
+# In[22]:
+
+# 检测不同的alpha值对于预测性能的影响，给出测试函数
+def test_Ridge_alpha(*data):
+    X_train, X_test, y_train, y_test = data
+    alphas=[0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000]
+    scores=[]
+    for i,alpha in enumerate(alphas):
+        regr = linear_model.Ridge(alpha=alpha)
+        regr.fit(X_train, y_train)
+        scores.append(regr.score(X_test, y_test))
+    #绘图
+    fig=plt.figure()
+    ax=fig.add_subplot(1, 1, 1)
+    ax.plot(alphas, scores)
+    ax.set_xlabel(r"$\alpha$")
+    ax.set_ylabel(r"score")
+    ax.set_xscale('log')
+    ax.set_title("Ridge")
+    plt.show()
+
+
+# In[23]:
+
+# 调用函数
+X_train, X_test, y_train, y_test = load_data()
+test_Ridge_alpha(X_train, X_test, y_train, y_test)
+
+
+# In[ ]:
+
+#p15
+
+
+
+
+
+
+
