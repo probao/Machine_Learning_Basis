@@ -140,11 +140,99 @@ def test_Ridge_alpha(*data):
 X_train, X_test, y_train, y_test = load_data()
 test_Ridge_alpha(X_train, X_test, y_train, y_test)
 
+#################
+####Lasso回归####
+#################
+def test_Lasso(*data):
+    X_train, X_test, y_train, y_test = data
+    regr = linear_model.Lasso()
+    regr.fit(X_train, y_train)
+    print('Coefficients: %s, intercept %.2f' % (regr.coef_, regr.intercept_))
+    print("Residual sum of squares: %.2f" % np.mean((regr.predict(X_test)-y_test)**2))
+    print('Score: %.2f' % regr.score(X_test, y_test))
 
-# In[ ]:
+X_train, X_test, y_train, y_test = load_data()
+test_Lasso(X_train, X_test, y_train, y_test)
 
-#p15
+Coefficients: [   0.           -0.          442.67992538    0.            0.            0.
+   -0.            0.          330.76014648    0.        ], intercept 152.52
+Residual sum of squares: 3583.42
+Score: 0.28
 
+
+# 下面检验不同的alpha对于预测性能的影响，给出测试函数
+def test_Lasso_alpha(*data):
+    X_train, X_test, y_train, y_test = data
+    alphas = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000]
+    scores = []
+    for i, alpha in enumerate(alphas):
+        regr = linear_model.Lasso(alpha=alpha)
+        regr.fit(X_train, y_train)
+        scores.append(regr.score(X_test, y_test))
+#绘图
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.plot(alphas, scores)
+    ax.set_xlabel(r"$\alpha$")
+    ax.set_ylabel(r"score")
+    ax.set_xscale('log')
+    ax.set_title("Lasso")
+    plt.show()
+
+X_train, X_test, y_train, y_test = load_data()
+test_Lasso_alpha(X_train, X_test, y_train, y_test)
+
+
+#######################
+#### ElasticNet回归####
+#######################
+# ElasticNet回归是对Lasso回归和岭回归的融合，其惩罚项是L1范数和L2范数的一个权衡
+#使用ElasticNet的函数
+def test_ElasticNet(*data):
+    X_train, X_test, y_train, y_test = data
+    regr = linear_model.ElasticNet()
+    regr.fit(X_train, y_train)
+    print('Coefficients: %s, intercept %.2f' % (regr.coef_, regr.intercept_))
+    print("Residual sum of squares: %.2f" % np.mean((regr.predict(X_test)-y_test)**2))
+    print('Score: %.2f' % regr.score(X_test, y_test))
+
+X_train, X_test, y_train, y_test = load_data()
+test_ElasticNet(X_train, X_test, y_train, y_test)
+
+Coefficients: [ 0.40560736  0.          3.76542456  2.38531508  0.58677945  0.22891647
+ -2.15858149  2.33867566  3.49846121  1.98299707], intercept 151.93
+Residual sum of squares: 4922.36
+Score: 0.01
+
+# 下面检验不同的alpha，rho值对于预测性能的影响，给出测试函数
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+
+def test_ElasticNet_alpha_rho(*data):
+    X_train, X_test, y_train, y_test = data
+    alphas = np.logspace(-2, 2)
+    rhos = np.linspace(0.01, 1)
+    scores=[]
+    for alpha in alphas:
+        for rho in rhos:
+            regr = linear_model.ElasticNet(alpha=alpha, l1_ratio=rho)
+            regr.fit(X_train, y_train)
+            scores.append(regr.score(X_test, y_test))
+# 绘图
+    alphas, rhos = np.meshgrid(alphas, rhos)
+    scores = np.array(scores).reshape(alphas.shape)
+    fig = plt.figure()
+    ax=Axes3D(fig)
+    surf = ax.plot_surface(alphas, rhos, scores, rstride=1, cstride=1, cmap=cm.jet, linewidth=0, antialiased=False)
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+    ax.set_xlabel(r"$\alpha$")
+    ax.set_ylabel(r"$\rho$")
+    ax.set_zlabel("score")
+    ax.set_title("ElasticNet")
+    plt.show()
+
+X_train, X_test, y_train, y_test = load_data()
+test_ElasticNet_alpha_rho(X_train, X_test, y_train, y_test)
 
 
 
