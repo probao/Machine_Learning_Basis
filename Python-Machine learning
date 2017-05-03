@@ -421,6 +421,63 @@ def test_LinearDiscriminantAnalysis_shrinkage(*data):
 X_train, X_test, y_train, y_test = load_data()
 test_LinearDiscriminantAnalysis_shrinkage(X_train, X_test, y_train, y_test)
 
+################################
+######第三章 贝叶斯分类器#######
+################################
+# http://blog.csdn.net/lsldd/article/details/41542107
+
+
+# 首先导入包
+from sklearn import datasets, cross_validation, naive_bayes
+import numpy as np
+import matplotlib.pyplot as plt
+
+def show_digits():
+    digits = datasets.load_digits()
+    fig = plt.figure()
+    print("vector from images 0:" ,digits.data[0])
+    for i in range(25):
+        ax=fig.add_subplot(5,5,i+1)
+        ax.imshow(digits.images[i], cmap=plt.cm.gray_r, interpolation='nearest')
+    plt.show()
+
+
+digits = datasets.load_digits()
+digits.target[1]
+1
+
+
+digits = datasets.load_digits()
+digits.data[1]
+array([  0.,   0.,   0.,  12.,  13.,   5.,   0.,   0.,   0.,   0.,   0.,
+        11.,  16.,   9.,   0.,   0.,   0.,   0.,   3.,  15.,  16.,   6.,
+         0.,   0.,   0.,   7.,  15.,  16.,  16.,   2.,   0.,   0.,   0.,
+         0.,   1.,  16.,  16.,   3.,   0.,   0.,   0.,   0.,   1.,  16.,
+        16.,   6.,   0.,   0.,   0.,   0.,   1.,  16.,  16.,   6.,   0.,
+         0.,   0.,   0.,   0.,  11.,  16.,  10.,   0.,   0.])
+
+def load_data():
+    digits = datasets.load_digits()
+    return cross_validation.train_test_split(digits.data, digits.target, test_size=0.25, random_state=0)
+
+
+# 高斯贝叶斯分类器（GaussianNB）
+def test_GaussianNB(*data):
+    X_train, X_test, y_train, y_test = data
+    cls = naive_bayes.GaussianNB()
+    cls.fit(X_train, y_train)
+    print('Training Score: %.2f' % cls.score(X_train, y_train))
+    print('Testing Score: %.2f' % cls.score(X_test, y_test))
+    
+X_train, X_test, y_train, y_test = load_data()
+test_GaussianNB(X_train, X_test, y_train, y_test)
+
+Training Score: 0.86
+Testing Score: 0.83
+
+
+
+
 
 
 
