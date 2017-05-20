@@ -480,6 +480,134 @@ Training Score: 0.991091
 Testing Score: 0.980000
 
 
+#考察k值以及投票策略对于预测性能的影响，给出测试函数
+def test_KNeighborsClassifier_k_w(*data):
+    X_train, X_test, y_train, y_test = data
+    Ks = np.linspace(1, y_train.size, num=100, endpoint=False, dtype='int')
+    weights=['uniform', 'distance']
+    
+    fig=plt.figure()
+    ax=fig.add_subplot(1,1,1)
+    for weight in weights:
+        training_scores = []
+        testing_scores = []
+        for K in Ks:
+            clf = neighbors.KNeighborsClassifier(weights=weight, n_neighbors=K)
+            clf.fit(X_train, y_train)
+            testing_scores.append(clf.score(X_test, y_test))
+            training_scores.append(clf.score(X_train, y_train))
+        ax.plot(Ks, testing_scores, label="testing score:weights=%s"%weight)
+        ax.plot(Ks, training_scores, label="training score:weights=%s"%weight)
+    ax.legend(loc='best')
+    ax.set_xlabel("K")
+    ax.set_ylabel("score")
+    ax.set_ylim(0, 1.05)
+    ax.set_title("KNeighborsClassifier")
+    plt.show()
+    
+X_train, X_test, y_train, y_test = load_classification_data()
+test_KNeighborsClassifier_k_w(X_train, X_test, y_train, y_test)
+
+
+#考察p值（即距离函数的形式）对于预测性能的影响，给出测试函数
+def test_KNeighborsClassifier_k_p(*data):
+    X_train, X_test, y_train, y_test = data
+    Ks = np.linspace(1, y_train.size, endpoint=False, dtype='int')
+    Ps = [1, 2, 10]
+    
+    fig=plt.figure()
+    ax=fig.add_subplot(1,1,1)
+    for P in Ps:
+        training_scores=[]
+        testing_scores=[]
+        for K in Ks:
+            clf=neighbors.KNeighborsClassifier(p=P, n_neighbors=K)
+            clf.fit(X_train, y_train)
+            testing_scores.append(clf.score(X_test, y_test))
+            training_scores.append(clf.score(X_train, y_train))
+        ax.plot(Ks, testing_scores, label="testing score:p=%d" %P)
+        ax.plot(Ks, training_scores, label="training score=%d" %P)
+    ax.legend(loc='best')
+    ax.set_xlabel("K")
+    ax.set_ylabel("score")
+    ax.set_ylim(0, 1.05)
+    ax.set_title("KNeighborsClassifier")
+    plt.show()
+    
+X_train, X_test, y_train, y_test = load_classification_data()
+test_KNeighborsClassifier_k_p(X_train, X_test, y_train, y_test)
+
+
+# kNN回归KNeighborsRegressor
+def test_KNeighborsRegressor(*data):
+    X_train, X_test, y_train, y_test = data
+    regr = neighbors.KNeighborsRegressor()
+    regr.fit(X_train, y_train)
+    print("Training Score: %f" %regr.score(X_train, y_train))
+    print("Testing Score: %f" %regr.score(X_test, y_test))
+    
+X_train, X_test, y_train, y_test = create_regression_data(1000)
+test_KNeighborsRegressor(X_train, X_test, y_train, y_test)
+
+
+#考察k值以及投票策略对预测性能的影响
+def test_KNeighborsRegressor_k_w(*data):
+    X_train, X_test, y_train, y_test=data
+    Ks=np.linspace(1, y_train.size, num=100, endpoint=False, dtype='int')
+    weights = ['uniform', 'distance']
+    
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    for weight in weights:
+        training_scores=[]
+        testing_scores=[]
+        for K in Ks:
+            regr = neighbors.KNeighborsRegressor(weights=weight, n_neighbors=K)
+            regr.fit(X_train, y_train)
+            testing_scores.append(regr.score(X_test, y_test))
+            training_scores.append(regr.score(X_train, y_train))
+        ax.plot(Ks, testing_scores, label="testing score:weight=%s"%weight)
+        ax.plot(Ks, training_scores, label="training score:weight=%s"%weight)
+    ax.legend(loc='best')
+    ax.set_xlabel("K")
+    ax.set_ylabel("score")
+    ax.set_ylim(0, 1.05)
+    ax.set_title("KNeighborsRegressor")
+    plt.show()
+
+X_train, X_test, y_train, y_test = create_regression_data(1000)
+test_KNeighborsRegressor_k_w(X_train, X_test, y_train, y_test)
+
+
+# 考察p值（即距离函数的形式）对于预测性能的影响，给出测试函数
+def test_KNeighborsRegressor_k_p(*data):
+    X_train, X_test, y_train, y_test=data
+    Ks=np.linspace(1, y_train.size, num=100, endpoint=False, dtype='int')
+    Ps = [1, 2, 10]
+    
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    for P in Ps:
+        training_scores=[]
+        testing_scores=[]
+        for K in Ks:
+            regr = neighbors.KNeighborsRegressor(p=P, n_neighbors=K)
+            regr.fit(X_train, y_train)
+            testing_scores.append(regr.score(X_test, y_test))
+            training_scores.append(regr.score(X_train, y_train))
+        ax.plot(Ks, testing_scores, label="testing score:p=%s"%P)
+        ax.plot(Ks, training_scores, label="training score:p=%s"%P)
+    ax.legend(loc='best')
+    ax.set_xlabel("K")
+    ax.set_ylabel("score")
+    ax.set_ylim(0, 1.05)
+    ax.set_title("KNeighborsRegressor")
+    plt.show()
+
+X_train, X_test, y_train, y_test = create_regression_data(1000)
+test_KNeighborsRegressor_k_p(X_train, X_test, y_train, y_test)
+
+
 
 
 
