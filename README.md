@@ -1,2 +1,2 @@
 # Machine_Learning_Basis
-# A computational chemistry PhD start learning ML
+I should learn to link Github and my jupyter notebook
